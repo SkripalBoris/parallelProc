@@ -52,7 +52,7 @@ void WordsCounter::countWoldIncludes(std::string inputString,
             map->insert(std::pair<std::string,int>(pch,1));
             keys->push_back(pch); 
         }
-        pch = strtok (NULL, " ,.-");
+        pch = strtok (NULL, " ,. \"!?()");
     }
     delete (workCharArr);
 }
