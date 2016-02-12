@@ -2,7 +2,7 @@
 #define WORDSCOUNTER_H
 
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -19,7 +19,6 @@ public:
     std::vector<std::string>* getKeyVector();
     virtual ~WordsCounter();
 private:
-    void deleteWorkSymbols(std::string &inputString);
     void countWoldIncludes(std::string inputString,
         std::map <std::string, int> *map, std::vector<std::string> *keys);
 };

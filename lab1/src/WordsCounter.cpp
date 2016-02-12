@@ -11,7 +11,6 @@ WordsCounter::WordsCounter(std::string inputString) {
     this->workString = inputString;
     counterMap = new std::map<std::string, int>;
     keys = new std::vector<std::string>;
-    deleteWorkSymbols(this->workString);
     countWoldIncludes(this->workString,this->counterMap,this->keys);
 }
 
@@ -30,50 +29,30 @@ std::vector<std::string>* WordsCounter::getKeyVector() {
     return this->keys;
 }
 
-void WordsCounter::deleteWorkSymbols(std::string &inputString) {
-    if(inputString.length()==0)
-        return;
-    
-    char chars[] = "()-,.!?\"\'";
-
-    for (unsigned int i = 0; i < strlen(chars); ++i)
-    {
-      inputString.erase (std::remove(inputString.begin(), inputString.end(),
-              chars[i]), inputString.end());
-    }
-}
-
 void WordsCounter::countWoldIncludes(std::string inputString,
         std::map <std::string, int> *map, std::vector<std::string> *keys) {
     if(map == NULL)
         return;
     if(inputString.length() == 0)
         return;
-    int fromCounter = 0;
-    int toCounter = inputString.find(' ',fromCounter);
-        if(toCounter == std::string::npos)
-            toCounter = inputString.length();
     
-    do {  
-        std::string buf = inputString.substr(fromCounter,toCounter-fromCounter);
-        if(map->count(buf)) {
-            int bufCount = map->at(buf);
+    char * workCharArr = new char[inputString.length() + 1];
+    std::strcpy(workCharArr,inputString.c_str());
+    
+    char * pch = std::strtok (workCharArr," ,. \"!?()");
+    
+    while (pch != NULL) {  
+        if(map->count(pch)) {
+            int bufCount = map->at(pch);
             std::map<std::string, int>::iterator itMap = map->begin();
-            itMap = map->find(buf);
+            itMap = map->find(pch);
             map->erase(itMap);
-            map->insert(std::pair<std::string,int>(buf,++bufCount));
-            keys->push_back(buf);            
+            map->insert(std::pair<std::string,int>(pch,++bufCount));   
         } else {
-            map->insert(std::pair<std::string,int>(buf,1));
+            map->insert(std::pair<std::string,int>(pch,1));
+            keys->push_back(pch); 
         }
-        
-        if(toCounter == inputString.length())
-            return;
-        
-        fromCounter = toCounter+1;
-        toCounter = inputString.find(' ',fromCounter);
-        if(toCounter == std::string::npos)
-            toCounter = inputString.length();  
-        
-    } while (true);
+        pch = strtok (NULL, " ,.-");
+    }
+    delete (workCharArr);
 }
