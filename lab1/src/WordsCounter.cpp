@@ -39,7 +39,7 @@ void WordsCounter::countWoldIncludes(std::string inputString,
     char * workCharArr = new char[inputString.length() + 1];
     std::strcpy(workCharArr,inputString.c_str());
     
-    char * pch = std::strtok (workCharArr," ,. \"!?()");
+    char * pch = std::strtok (workCharArr," ,. \"!?()\n");
     
     while (pch != NULL) {  
         if(map->count(pch)) {
@@ -52,7 +52,7 @@ void WordsCounter::countWoldIncludes(std::string inputString,
             map->insert(std::pair<std::string,int>(pch,1));
             keys->push_back(pch); 
         }
-        pch = strtok (NULL, " ,. \"!?()");
+        pch = strtok (NULL, " ,. \"!?()\n");
     }
     delete (workCharArr);
 }

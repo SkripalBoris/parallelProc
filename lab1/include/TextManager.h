@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <stdio.h>
 
 #include "ProjectOptions.h"
+#include "WordsCounter.h"
 
 class TextManager {
 private:
@@ -19,6 +21,8 @@ private:
 public:
     TextManager();
     TextManager(std::string inputString);
+    TextManager(FILE *file);
+    void printResult();
     virtual ~TextManager();
     std::map <std::string,int >* getCounterMap();
     std::vector < std::string >* getKeysVector();
@@ -29,9 +33,9 @@ private:
      *  первые два указателя карты и мектора ключей соответственно
      */
     void mergeMapsAndVectors(std::map <std::string,int >* aMap, 
-        std::vector < std::string > aKey,
+        std::vector < std::string >* aKey,
         std::map <std::string,int >* bMap,
-        std::vector < std::string > bKey);
+        std::vector < std::string >* bKey);
 };
 
 #endif /* TEXTMANAGER_H */

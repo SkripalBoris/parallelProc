@@ -1,17 +1,56 @@
 #include <stdlib.h>
+#include <iostream>
 
 #include "TextManager.h"
-#include "WordsCounter.h"
 
 TextManager::TextManager() {
-    globalVectorOfCounterMap = new std::vector< std::map <std::string,int > >;
+    globalVectorOfCounterMap = new std::vector < std::map <std::string,int > >;
     globalVectorOfKeysVector = new std::vector < std::vector < std::string > >;
+    globalCounterMap = new std::map <std::string,int >;
+    globalKeysVector = new std::vector < std::string >;
 }
 
 TextManager::TextManager(std::string inputString) {
     globalVectorOfCounterMap = new std::vector < std::map <std::string,int > >;
     globalVectorOfKeysVector = new std::vector < std::vector < std::string > >;
+    globalCounterMap = new std::map <std::string,int >;
+    globalKeysVector = new std::vector < std::string >;
     generateWordsFreq(inputString);
+}
+
+void TextManager::printResult() {
+    for (std::vector<std::string>::iterator it = globalKeysVector->begin() ; it != globalKeysVector->end(); ++it) {
+        //std::cout << (*it) << " " << globalCounterMap->find(*it) << std::endl;
+        std::string bufName = *it;
+        int bufCount = globalCounterMap->at(*it);
+        printf("%s %d\n",bufName.c_str(),bufCount);
+    }
+}
+
+TextManager::TextManager(FILE *file) {
+     if (file == NULL) {
+        perror("File error");
+        exit(1);
+    }
+
+    fseek(file, 0, SEEK_END);
+    long lSize = (size_t) ftell(file);
+    rewind(file);
+
+    char* buffer = new char[lSize];
+    fread(buffer, 1, lSize, file);
+    
+    std::string bufStr(buffer);
+    
+    globalVectorOfCounterMap = new std::vector < std::map <std::string,int > >;
+    globalVectorOfKeysVector = new std::vector < std::vector < std::string > >;
+    globalCounterMap = new std::map <std::string,int >;
+    globalKeysVector = new std::vector < std::string >;
+    generateWordsFreq(bufStr);
+    
+    fclose(file);
+    
+    delete(buffer);
 }
 
 TextManager::~TextManager() {
@@ -19,6 +58,10 @@ TextManager::~TextManager() {
         delete(globalVectorOfCounterMap);
     if(globalVectorOfKeysVector != NULL)
         delete(globalVectorOfKeysVector);
+    if(globalCounterMap != NULL)
+        delete(globalCounterMap);
+    if(globalKeysVector != NULL)
+        delete(globalKeysVector);
 }
 
 void TextManager::generateWordsFreq(std::string inputString) {
@@ -56,20 +99,12 @@ void TextManager::generateWordsFreq(std::string inputString) {
     }
     
     delete(stringVector);
-    
-    if(this->globalCounterMap != NULL)
-        delete(this->globalCounterMap);
-    if(this->globalKeysVector != NULL)
-        delete(this->globalKeysVector);
-    
-    this->globalCounterMap = new std::map <std::string,int >;
-    this->globalKeysVector = new std::vector < std::string >;
-    
+        
     std::vector< std::map <std::string,int > >::iterator itMap = this->globalVectorOfCounterMap->begin();
     std::vector< std::vector < std::string > >::iterator itKey = this->globalVectorOfKeysVector->begin();
     while(true) {
-        std::vector < std::string > *bufKeys = &itKey;
-        std::map <std::string,int > *bufMap = &itMap;
+        std::vector<std::string>* bufKeys = &(*itKey);
+        std::map <std::string,int >* bufMap = &(*itMap);
         mergeMapsAndVectors(this->globalCounterMap,this->globalKeysVector,
                 bufMap, bufKeys);
         itMap++;
@@ -79,7 +114,7 @@ void TextManager::generateWordsFreq(std::string inputString) {
     }    
 }
 
-void mergeMapsAndVectors(std::map <std::string,int > *aMap,
+void TextManager::mergeMapsAndVectors(std::map <std::string,int > *aMap,
         std::vector < std::string > *aKey,
         std::map <std::string,int > *bMap,
         std::vector < std::string > *bKey) {
