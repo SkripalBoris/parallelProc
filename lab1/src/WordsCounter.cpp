@@ -1,4 +1,6 @@
 #include <string.h>
+#include <wctype.h>
+#include <ios>
 
 #include "WordsCounter.h"
 
@@ -41,7 +43,14 @@ void WordsCounter::countWoldIncludes(std::string inputString,
     
     char * pch = std::strtok (workCharArr," ,. \"!?()\n");
     
-    while (pch != NULL) {  
+    while (pch != NULL) {
+        int i = 0;
+        
+        /*while(pch[i]) {
+            //boos
+            pch[i++] = tolower(pch[i]);
+        }*/
+
         if(map->count(pch)) {
             int bufCount = map->at(pch);
             std::map<std::string, int>::iterator itMap = map->begin();
