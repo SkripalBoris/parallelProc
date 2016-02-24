@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/src/GlobalMap.o \
 	${OBJECTDIR}/src/TextManager.o \
 	${OBJECTDIR}/src/WordsCounter.o \
 	${OBJECTDIR}/src/main.o
@@ -44,10 +45,13 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 
 # Test Files
 TESTFILES= \
+	${TESTDIR}/TestFiles/f2 \
 	${TESTDIR}/TestFiles/f1
 
 # Test Object Files
 TESTOBJECTFILES= \
+	${TESTDIR}/tests/TestManagerTestClass.o \
+	${TESTDIR}/tests/TestManagerTestRunner.o \
 	${TESTDIR}/tests/newWordsCounterTestClass.o \
 	${TESTDIR}/tests/newWordsCounterTestRunner.o
 
@@ -75,6 +79,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/lab1: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/lab1 ${OBJECTFILES} ${LDLIBSOPTIONS}
 
+${OBJECTDIR}/src/GlobalMap.o: src/GlobalMap.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/GlobalMap.o src/GlobalMap.cpp
+
 ${OBJECTDIR}/src/TextManager.o: src/TextManager.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -97,9 +106,25 @@ ${OBJECTDIR}/src/main.o: src/main.cpp
 .build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
 .build-tests-subprojects:
 
+${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/TestManagerTestClass.o ${TESTDIR}/tests/TestManagerTestRunner.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
+
 ${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/newWordsCounterTestClass.o ${TESTDIR}/tests/newWordsCounterTestRunner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
+
+
+${TESTDIR}/tests/TestManagerTestClass.o: tests/TestManagerTestClass.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/TestManagerTestClass.o tests/TestManagerTestClass.cpp
+
+
+${TESTDIR}/tests/TestManagerTestRunner.o: tests/TestManagerTestRunner.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/TestManagerTestRunner.o tests/TestManagerTestRunner.cpp
 
 
 ${TESTDIR}/tests/newWordsCounterTestClass.o: tests/newWordsCounterTestClass.cpp 
@@ -113,6 +138,19 @@ ${TESTDIR}/tests/newWordsCounterTestRunner.o: tests/newWordsCounterTestRunner.cp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newWordsCounterTestRunner.o tests/newWordsCounterTestRunner.cpp
 
+
+${OBJECTDIR}/src/GlobalMap_nomain.o: ${OBJECTDIR}/src/GlobalMap.o src/GlobalMap.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/GlobalMap.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Iinclude -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/GlobalMap_nomain.o src/GlobalMap.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/GlobalMap.o ${OBJECTDIR}/src/GlobalMap_nomain.o;\
+	fi
 
 ${OBJECTDIR}/src/TextManager_nomain.o: ${OBJECTDIR}/src/TextManager.o src/TextManager.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -157,6 +195,7 @@ ${OBJECTDIR}/src/main_nomain.o: ${OBJECTDIR}/src/main.o src/main.cpp
 .test-conf:
 	@if [ "${TEST}" = "" ]; \
 	then  \
+	    ${TESTDIR}/TestFiles/f2 || true; \
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	else  \
 	    ./${TEST} || true; \
