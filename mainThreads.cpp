@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <string>
 #include <unistd.h>
+#include <sys/time.h>
 
 /**********************************************************************************************************************/
-#define WORD_ARRAY_FRAME_SIZE 10
+#define WORD_ARRAY_FRAME_SIZE 50
 /**********************************************************************************************************************/
 /*
  * Глобальная мапа с количеством повторений слов
@@ -81,10 +82,25 @@ int main(int argc, char *argv[]) {
 
     std::string bufStr(buffer);
 
-    //инициализация исключающей блокировки
+    // инициализация исключающей блокировки
     pthread_mutex_init(&lock, NULL);
+    
+    // Инициализация счетчика
+    struct timeval tvStart;
+    struct timeval tvFinish;
+
+    // Получение времени начала работы
+    gettimeofday(&tvStart,NULL);
 
     generateWordsFreq(bufStr);
+    
+    // Получение времени конца работы
+    gettimeofday(&tvFinish,NULL);
+    long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
+    long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
+    
+    printf("%ld\n",msFinish - msStart);
+
     printResult();
 
     //Удаляем исключающую блокировку
@@ -193,6 +209,8 @@ void generateWordsFreq(std::string inputString) {
         }
     }
 
+    createThreadsCounter = stringVector->size();
+
     for (std::vector<std::string>::iterator it = stringVector->begin(); it != stringVector->end(); ++it) {
         char *arg = new char[(*it).length()];
         strcpy(arg, (*it).c_str());
@@ -201,7 +219,6 @@ void generateWordsFreq(std::string inputString) {
         pthread_create(&thread, NULL, countWoldIncludes, (void *) arg);
         // переводим в отсоединенный режим
         pthread_detach(thread);
-        createThreadsCounter++;
     }
 
     while (finishThreadsCounter < createThreadsCounter)
