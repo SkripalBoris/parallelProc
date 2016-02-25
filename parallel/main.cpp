@@ -1,0 +1,238 @@
+#include <map>
+#include <vector>
+#include <cstring>
+#include <stdio.h>
+#include <string>
+#include <unistd.h>
+#include <sys/time.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+/**********************************************************************************************************************/
+#define RECOMENDED_THREADS_NUMBER 3
+/**********************************************************************************************************************/
+/*
+ * Глобальная мапа с количеством повторений слов
+ */
+std::map<std::string, int> *wordsMap;
+/*
+ * Глобальный вектор со словами
+ */
+std::vector<std::string> *wordsVector;
+/*
+ * Количество созданных потоков
+ */
+int createThreadsCounter;
+/*
+ * Количество отработавших потоков
+ */
+int finishThreadsCounter;
+/*
+ * Исключающая блокировка
+ */
+pthread_mutex_t lock;
+/*
+ * Размер окна
+ */
+long frameSize;
+/*
+ * Размер считаных символов
+ */
+long lSize;
+
+/**********************************************************************************************************************/
+/*
+ * Функция добавления новых значений в глобальные структуры
+ */
+void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
+                        std::vector<std::string> *newKeysVector);
+
+/*
+ * Функция подсчета слов в строке
+ * В качестве параметра передается указатель на массив символов
+ */
+void *countWoldIncludes(void *arg);
+
+/*
+ * Функция генерации потоков
+ */
+void generateWordsFreq(const char *inputString);
+
+/*
+ * Печать результатов
+ */
+void printResult();
+
+/**********************************************************************************************************************/
+int main(int argc, char *argv[]) {
+    if (argc == 1) {
+        printf("Please write filename in parameter\n");
+        return 1;
+    }
+
+    wordsMap = new std::map<std::string, int>;
+    wordsVector = new std::vector<std::string>;
+    createThreadsCounter = 0;
+    finishThreadsCounter = 0;
+
+    //Открытие файла
+    FILE *file = fopen(argv[1], "r");
+
+    if (file == NULL) {
+        perror("File error");
+        return 2;
+    }
+
+    fseek(file, 0, SEEK_END);
+    lSize = (size_t) ftell(file);
+    frameSize = lSize / RECOMENDED_THREADS_NUMBER + 1;
+    rewind(file);
+
+    //char* buffer = new char[lSize];
+    char *buffer = (char *) malloc((size_t) lSize);
+    fread(buffer, 1, lSize, file);
+
+    // инициализация исключающей блокировки
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("\n mutex init failed\n");
+        return 1;
+    }
+
+    // Инициализация счетчика
+    struct timeval tvStart;
+    struct timeval tvFinish;
+
+    // Получение времени начала работы
+    gettimeofday(&tvStart, NULL);
+
+    generateWordsFreq(buffer);
+
+    // Получение времени конца работы
+    gettimeofday(&tvFinish, NULL);
+    long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
+    long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
+
+    printf("%ld\n", msFinish - msStart);
+
+    printResult();
+
+    //Удаляем исключающую блокировку
+    pthread_mutex_destroy(&lock);
+    fclose(file);
+    delete (buffer);
+    delete (wordsVector);
+    delete (wordsMap);
+    return 0;
+}
+
+void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
+                        std::vector<std::string> *newKeysVector) {
+    if (wordsMap == NULL) {
+        wordsMap = new std::map<std::string, int>;
+        wordsVector = new std::vector<std::string>;
+
+        for (std::vector<std::string>::iterator it = newKeysVector->begin(); it != newKeysVector->end(); ++it) {
+            int bufCountB = newCounterMap->at(*it);
+            wordsMap->insert(std::pair<std::string, int>(*it, bufCountB));
+            wordsVector->push_back(*it);
+        }
+        return;
+    }
+
+    if (newCounterMap == NULL)
+        return;
+
+    if (newKeysVector == NULL)
+        return;
+
+    for (std::vector<std::string>::iterator it = newKeysVector->begin(); it != newKeysVector->end(); ++it) {
+        if (wordsMap->count(*it)) {
+            int bufCountA = wordsMap->at(*it);
+            int bufCountB = newCounterMap->at(*it);
+            std::map<std::string, int>::iterator itMap;
+            itMap = wordsMap->find(*it);
+            wordsMap->erase(itMap);
+            wordsMap->insert(std::pair<std::string, int>(*it, bufCountA + bufCountB));
+        } else {
+            int bufCountB = newCounterMap->at(*it);
+            wordsMap->insert(std::pair<std::string, int>(*it, bufCountB));
+            wordsVector->push_back(*it);
+        }
+    }
+}
+
+void *countWoldIncludes(void *arg) {
+    char *workCharArr = (char *) arg;
+
+    std::map<std::string, int> *wMap = new std::map<std::string, int>;
+    std::vector<std::string> *wVector = new std::vector<std::string>;
+
+    char *pch = std::strtok(workCharArr, " ,. \"!?()\n");
+
+    while (pch != NULL) {
+        if (wMap->count(pch)) {
+            int bufCount = wMap->at(pch);
+            std::map<std::string, int>::iterator itMap = wMap->find(pch);
+            wMap->erase(itMap);
+            wMap->insert(std::pair<std::string, int>(pch, ++bufCount));
+        } else {
+            wMap->insert(std::pair<std::string, int>(pch, 1));
+            wVector->push_back(pch);
+        }
+        pch = strtok(NULL, " ,. \"!?()\n");
+    }
+
+    // устанавливаем блокировку
+    pthread_mutex_lock(&lock);
+    addNewMapAndVector(wMap, wVector);
+    finishThreadsCounter++;
+    // снимаем блокировку
+    pthread_mutex_unlock(&lock);
+
+    delete (wMap);
+    delete (wVector);
+//    free (workCharArr);
+}
+
+void generateWordsFreq(const char *inputString) {
+    //std::vector<std::string> *stringVector = new std::vector<std::string>;
+    if (inputString == NULL)
+        return;
+
+    long counterFrom = 0;
+    long counterTo = 0;
+
+    while (counterTo < (lSize - 1)) {
+        char *workArray = new char[frameSize + 1];
+        workArray[frameSize] = '\0';
+
+        counterTo += frameSize;
+        while (inputString[counterTo] != ' ')
+            counterTo++;
+
+        if (counterTo > lSize)
+            counterTo = lSize - 1;
+
+        strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
+
+        counterFrom = counterTo + 1;
+
+        pthread_t thread;
+        //создаем поток для вычислений
+        pthread_create(&thread, NULL, countWoldIncludes, (void *) workArray);
+        // переводим в отсоединенный режим
+        pthread_join(thread, NULL);
+    }
+
+    while (finishThreadsCounter < createThreadsCounter)
+        usleep(1);
+
+}
+
+void printResult() {
+    for (std::vector<std::string>::iterator it = wordsVector->begin(); it != wordsVector->end(); ++it) {
+        std::string bufName = *it;
+        int bufCount = wordsMap->at(*it);
+        printf("%s %d\n", bufName.c_str(), bufCount);
+    }
+}
