@@ -7,7 +7,7 @@
 #include <sys/time.h>
 
 /**********************************************************************************************************************/
-#define RECOMENDED_THREADS_NUMBER 4
+#define WORD_ARRAY_FRAME_SIZE 70
 /**********************************************************************************************************************/
 /*
  * Глобальная мапа с количеством повторений слов
@@ -17,26 +17,6 @@ std::map<std::string, int> *wordsMap;
  * Глобальный вектор со словами
  */
 std::vector<std::string> *wordsVector;
-/*
- * Количество созданных потоков
- */
-int createThreadsCounter;
-/*
- * Количество отработавших потоков
- */
-int finishThreadsCounter;
-/*
- * Исключающая блокировка
- */
-pthread_mutex_t lock;
-/*
- * Размер окна
- */
-long frameSize;
-/*
- * Размер считаных символов
- */
-long lSize;
 
 /**********************************************************************************************************************/
 /*
@@ -49,12 +29,12 @@ void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
  * Функция подсчета слов в строке
  * В качестве параметра передается указатель на массив символов
  */
-void *countWoldIncludes(void *arg);
+void countWoldIncludes(char *workCharArr);
 
 /*
  * Функция генерации потоков
  */
-void generateWordsFreq(const char *inputString);
+void generateWordsFreq(std::string inputString);
 
 /*
  * Печать результатов
@@ -70,8 +50,6 @@ int main(int argc, char *argv[]) {
 
     wordsMap = new std::map<std::string, int>;
     wordsVector = new std::vector<std::string>;
-    createThreadsCounter = 0;
-    finishThreadsCounter = 0;
 
     //Открытие файла
     FILE *file = fopen(argv[1],"r");
@@ -82,20 +60,14 @@ int main(int argc, char *argv[]) {
     }
 
     fseek(file, 0, SEEK_END);
-    lSize = (size_t) ftell(file);
-    frameSize = lSize / RECOMENDED_THREADS_NUMBER;
+    long lSize = (size_t) ftell(file);
     rewind(file);
 
     char* buffer = new char[lSize];
     fread(buffer, 1, lSize, file);
 
-    // инициализация исключающей блокировки
-    if (pthread_mutex_init(&lock, NULL) != 0)
-    {
-        printf("\n mutex init failed\n");
-        return 1;
-    }
-    
+    std::string bufStr(buffer);
+
     // Инициализация счетчика
     struct timeval tvStart;
     struct timeval tvFinish;
@@ -103,7 +75,7 @@ int main(int argc, char *argv[]) {
     // Получение времени начала работы
     gettimeofday(&tvStart,NULL);
 
-    generateWordsFreq(buffer);
+    generateWordsFreq(bufStr);
     
     // Получение времени конца работы
     gettimeofday(&tvFinish,NULL);
@@ -114,8 +86,6 @@ int main(int argc, char *argv[]) {
 
     printResult();
 
-    //Удаляем исключающую блокировку
-    pthread_mutex_destroy(&lock);
     fclose(file);
     delete(buffer);
     delete (wordsVector);
@@ -159,8 +129,7 @@ void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
     }
 }
 
-void *countWoldIncludes(void *arg) {
-    char *workCharArr = (char *) arg;
+void countWoldIncludes(char *workCharArr) {
 
     std::map<std::string, int> *wMap = new std::map<std::string, int>;
     std::vector<std::string> *wVector = new std::vector<std::string>;
@@ -181,58 +150,26 @@ void *countWoldIncludes(void *arg) {
         pch = strtok(NULL, " ,. \"!?()\n");
     }
 
-    // устанавливаем блокировку
-    pthread_mutex_lock(&lock);
     addNewMapAndVector(wMap, wVector);
-    finishThreadsCounter++;
-    // снимаем блокировку
-    pthread_mutex_unlock(&lock);
 
     delete (wMap);
     delete (wVector);
 }
 
-void generateWordsFreq(const char *inputString) {
-    //std::vector<std::string> *stringVector = new std::vector<std::string>;
-    if (inputString == NULL)
+void generateWordsFreq(std::string inputString) {
+    std::vector<std::string> *stringVector = new std::vector<std::string>;
+    std::string workString = inputString;
+    if (inputString.empty())
         return;
 
-/*
-    int frameSize;
-
-    if(spaceNumber > RECOMENDED_THREADS_NUMBER * WORD_ARRAY_FRAME_SIZE)
-        frameSize = spaceNumber / RECOMENDED_THREADS_NUMBER;
-    else
-        frameSize = WORD_ARRAY_FRAME_SIZE;
-*/
-    long counterFrom = 0;
-    long counterTo = 0;
-
-    while(counterTo < lSize) {
-        char* workArray = new char[frameSize + 1];
-
-        counterTo += frameSize;
-        if(counterTo > lSize)
-            counterTo = lSize;
-
-        strncpy(workArray, inputString + counterFrom, counterTo);
-
-        counterFrom += counterTo + 1;
-
-        pthread_t thread;
-        //создаем поток для вычислений
-        pthread_create(&thread, NULL, countWoldIncludes, (void *) workArray);
-        // переводим в отсоединенный режим
-        //pthread_detach(thread);
-        pthread_join(thread, NULL);
-    }
-    /*while (true) {
-
-        for (int i = 0; i < frameSize; i++) {
+    while (true) {
+        int counterFrom = 0;
+        int counterTo = 0;
+        for (int i = 0; i < WORD_ARRAY_FRAME_SIZE; i++) {
             counterTo = workString.find(' ', counterFrom);
             if (counterTo == std::string::npos) {
                 counterTo = workString.length();
-                i = frameSize;
+                i = WORD_ARRAY_FRAME_SIZE;
             } else {
                 counterFrom = counterTo + 1;
             }
@@ -245,25 +182,16 @@ void generateWordsFreq(const char *inputString) {
             stringVector->push_back(workString);
             break;
         }
-    }*/
-
-    /*createThreadsCounter = stringVector->size();
+    }
 
     for (std::vector<std::string>::iterator it = stringVector->begin(); it != stringVector->end(); ++it) {
         char *arg = new char[(*it).length()];
         strcpy(arg, (*it).c_str());
-        pthread_t thread;
-        //создаем поток для вычислений
-        pthread_create(&thread, NULL, countWoldIncludes, (void *) arg);
-        // переводим в отсоединенный режим
-        //pthread_detach(thread);
-        pthread_join(thread, NULL);
-    }*/
+        countWoldIncludes(arg);
 
-    while (finishThreadsCounter < createThreadsCounter)
-        usleep(1);
+    }
 
-    //delete (stringVector);
+    delete (stringVector);
 }
 
 void printResult() {
