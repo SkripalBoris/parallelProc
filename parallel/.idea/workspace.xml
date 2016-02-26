@@ -12,45 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b0a7974b-1893-4cfb-ad4b-49a1ef9169f0" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/serial.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../serial/CMakeLists.txt" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/.dep.inc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/Makefile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/include/GlobalMap.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/include/ProjectOptions.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/include/TextManager.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/include/WordsCounter.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Makefile-Debug.mk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Makefile-Release.mk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Makefile-impl.mk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Makefile-variables.mk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Package-Debug.bash" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/Package-Release.bash" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/configurations.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/private/Makefile-variables.mk" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/private/configurations.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/private/launcher.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/private/private.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/nbproject/project.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/res/test1.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/src/GlobalMap.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/src/TextManager.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/src/WordsCounter.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/src/main.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/TestManagerTestClass.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/TestManagerTestClass.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/TestManagerTestRunner.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/newWordsCounterTestClass.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/newWordsCounterTestClass.h" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../lab1/tests/newWordsCounterTestRunner.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../mainThreads.cpp" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/../mainSerial.cpp" afterPath="$PROJECT_DIR$/../serial/main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../makeSerial.mk" afterPath="$PROJECT_DIR$/../makeSerial.mk" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../testFiles/test1.txt" afterPath="$PROJECT_DIR$/../testFiles/test1.txt" />
@@ -77,8 +38,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.31528664">
-              <caret line="11" column="35" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.55">
+              <caret line="234" column="19" selection-start-line="234" selection-start-column="19" selection-end-line="234" selection-end-column="19" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -104,11 +65,12 @@
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
   </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="1417" />
+    <option name="x" value="51" />
     <option name="y" value="-4" />
-    <option name="width" value="1869" />
-    <option name="height" value="1084" />
+    <option name="width" value="1315" />
+    <option name="height" value="772" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -158,7 +120,23 @@
     </panes>
   </component>
   <component name="RunManager" selected="Application.Build All">
+    <configuration default="true" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="parallel" TARGET_NAME="parallel" CONFIG_NAME="Debug" TEST_MODE="SUITE_TEST">
+      <envs />
+      <method />
+    </configuration>
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="parallel" TARGET_NAME="parallel" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run-script" />
+      <scripts />
       <envs />
       <method />
     </configuration>
@@ -189,16 +167,17 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1417" y="-4" width="1869" height="1084" extended-state="6" />
-    <editor active="false" />
+    <frame x="51" y="-4" width="1315" height="772" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24986623" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24942966" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299389" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.4973384" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5026616" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985073" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299389" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -208,7 +187,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -224,10 +202,44 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/main.cpp</url>
+          <line>201</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/main.cpp</url>
+          <line>228</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="7" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -257,8 +269,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.31528664">
-          <caret line="11" column="35" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
+        <state vertical-scroll-proportion="0.55">
+          <caret line="234" column="19" selection-start-line="234" selection-start-column="19" selection-end-line="234" selection-end-column="19" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

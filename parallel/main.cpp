@@ -167,9 +167,13 @@ void *countWoldIncludes(void *arg) {
     std::map<std::string, int> *wMap = new std::map<std::string, int>;
     std::vector<std::string> *wVector = new std::vector<std::string>;
 
-    char *pch = std::strtok(workCharArr, " ,. \"!?()\n");
+    char *saveptr;
 
+    char *pch = strtok_r(workCharArr, " ,. \"!?()\n", &saveptr);
+
+    int i = 0;
     while (pch != NULL) {
+        i++;
         if (wMap->count(pch)) {
             int bufCount = wMap->at(pch);
             std::map<std::string, int>::iterator itMap = wMap->find(pch);
@@ -179,7 +183,7 @@ void *countWoldIncludes(void *arg) {
             wMap->insert(std::pair<std::string, int>(pch, 1));
             wVector->push_back(pch);
         }
-        pch = strtok(NULL, " ,. \"!?()\n");
+        pch = strtok_r(NULL, " ,. \"!?()\n", &saveptr);
     }
 
     // устанавливаем блокировку
@@ -195,14 +199,16 @@ void *countWoldIncludes(void *arg) {
 }
 
 void generateWordsFreq(const char *inputString) {
-    //std::vector<std::string> *stringVector = new std::vector<std::string>;
     if (inputString == NULL)
         return;
 
     long counterFrom = 0;
     long counterTo = 0;
 
+    int i = 0;
     while (counterTo < (lSize - 1)) {
+        if (counterTo == (lSize - 1))
+            break;
         char *workArray = new char[frameSize + 1];
         workArray[frameSize] = '\0';
 
@@ -219,14 +225,14 @@ void generateWordsFreq(const char *inputString) {
 
         pthread_t thread;
         //создаем поток для вычислений
+        createThreadsCounter++;
         pthread_create(&thread, NULL, countWoldIncludes, (void *) workArray);
         // переводим в отсоединенный режим
-        pthread_join(thread, NULL);
+        pthread_detach(thread);
     }
 
     while (finishThreadsCounter < createThreadsCounter)
-        usleep(1);
-
+        usleep(10);
 }
 
 void printResult() {
