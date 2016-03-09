@@ -53,7 +53,7 @@ void printResult();
 
 /**********************************************************************************************************************/
 int main(int argc, char *argv[]) {
-    if (argc == 1) {
+if (argc < 5 ) {
         printf("Please write filename in parameter\n");
         return 1;
     }
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     wordsVector = new std::vector<std::string>;
 
     //Открытие файла
-    FILE *file = fopen(argv[1], "r");
+    FILE *file = fopen(argv[4], "r");
 
     if (file == NULL) {
         perror("File error");
