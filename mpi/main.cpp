@@ -5,7 +5,7 @@
 #include <string>
 #include <unistd.h>
 #include <sys/time.h>
-#include <pthread.h>
+#include <mpi.h>
 #include <stdlib.h>
 
 /**********************************************************************************************************************/
@@ -52,8 +52,9 @@ void generateWordsFreq(const char *inputString);
 void printResult();
 
 /**********************************************************************************************************************/
-int main(int argc, char *argv[]) {
-if (argc < 5 ) {
+int main (int argc, char* argv[])
+{  
+    if (argc < 2) {
         printf("Please write filename in parameter\n");
         return 1;
     }
@@ -62,7 +63,7 @@ if (argc < 5 ) {
     wordsVector = new std::vector<std::string>;
 
     //Открытие файла
-    FILE *file = fopen(argv[4], "r");
+    FILE *file = fopen(argv[1], "r");
 
     if (file == NULL) {
         perror("File error");
@@ -85,7 +86,14 @@ if (argc < 5 ) {
     // Получение времени начала работы
     gettimeofday(&tvStart, NULL);
 
+int rank, size;
+ 
+  MPI_Init (&argc, &argv);      /* starts MPI */
+  MPI_Comm_rank (MPI_COMM_WORLD, &rank);        /* get current process id */
+  MPI_Comm_size (MPI_COMM_WORLD, &size);        /* get number of processes */
+  
     generateWordsFreq(buffer);
+     MPI_Finalize();
 
     // Получение времени конца работы
     gettimeofday(&tvFinish, NULL);
@@ -97,6 +105,8 @@ if (argc < 5 ) {
     printResult();
 
     fclose(file);
+    
+    
     delete (buffer);
     delete (wordsVector);
     delete (wordsMap);

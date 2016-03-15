@@ -24,6 +24,8 @@ for i in $TEST_FILES ; do
     $RDIR/workSerial $TEST_DIR/$i > $REPORT_DIR/"$i".result.serial
     echo "Start thread programm for test file $i"
     $RDIR/workThreads $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
+    echo "Start mpi programm for test file $i"
+    mpirun -np 1 $RDIR/workThreads $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
 done
 
 # Сравнение результатов
@@ -32,7 +34,11 @@ for i in $TEST_FILES ; do
     mv $REPORT_DIR/"$i".result.serial.tmp $REPORT_DIR/"$i".result.serial 
     
     cat $REPORT_DIR/"$i".result.thread | sort > $REPORT_DIR/"$i".result.thread.tmp
-    mv $REPORT_DIR/"$i".result.thread.tmp $REPORT_DIR/"$i".result.thread 
+    mv $REPORT_DIR/"$i".result.thread.tmp $REPORT_DIR/"$i".result.thread
+
+    cat $REPORT_DIR/"$i".result.mpi | sort > $REPORT_DIR/"$i".result.mpi.tmp
+    mv $REPORT_DIR/"$i".result.mpi.tmp $REPORT_DIR/"$i".result.mpi
     
     diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.thread > $REPORT_DIR/"$i".diff.serial.thread
+    diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.mpi > $REPORT_DIR/"$i".diff.serial.mpi
 done
