@@ -173,21 +173,24 @@ void generateWordsFreq(const char *inputString) {
     long counterTo = 0;
 
     while (counterTo < (lSize - 1)) {
-        char *workArray = new char[frameSize + 1];
-        workArray[frameSize] = '\0';
 
         counterTo += frameSize;
-        while (inputString[counterTo] != ' ')
+        while (inputString[counterTo] != ' ' && inputString[counterTo] != 0)
             counterTo++;
 
         if (counterTo > lSize)
             counterTo = lSize - 1;
+
+        char *workArray = new char[counterTo - counterFrom + 1];
+        workArray[frameSize] = '\0';
 
         strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
 
         counterFrom = counterTo + 1;
 
         countWoldIncludes(workArray);
+
+        delete (workArray);
     }
 }
 
