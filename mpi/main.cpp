@@ -181,23 +181,30 @@ void generateWordsFreq(const char *inputString) {
 
     long counterFrom = 0;
     long counterTo = 0;
+    
+    std::vector
 
     while (counterTo < (lSize - 1)) {
-        char *workArray = new char[frameSize + 1];
-        workArray[frameSize] = '\0';
-
         counterTo += frameSize;
-        while (inputString[counterTo] != ' ')
+        
+        while (inputString[counterTo] != ' ' && inputString[counterTo] != 0 && counterTo < lSize)
             counterTo++;
 
         if (counterTo > lSize)
             counterTo = lSize - 1;
+            
+        char *workArray = new char[counterTo - counterFrom + 1];
+        
+        for(int i=0;i < counterTo - counterFrom + 1;i++)
+			workArray[i] = 0;
 
         strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
 
         counterFrom = counterTo + 1;
 
         countWoldIncludes(workArray);
+        
+        free(workArray);
     }
 }
 
