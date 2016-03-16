@@ -28,6 +28,10 @@ long frameSize;
  */
 long lSize;
 
+int rank, size;
+
+MPI::Status status;
+
 /**********************************************************************************************************************/
 /*
  * Функция добавления новых значений в глобальные структуры
@@ -52,8 +56,7 @@ void generateWordsFreq(const char *inputString);
 void printResult();
 
 /**********************************************************************************************************************/
-int main (int argc, char* argv[])
-{  
+int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("Please write filename in parameter\n");
         return 1;
@@ -72,7 +75,6 @@ int main (int argc, char* argv[])
 
     fseek(file, 0, SEEK_END);
     lSize = (size_t) ftell(file);
-    frameSize = lSize / RECOMENDED_THREADS_NUMBER + 1;
     rewind(file);
 
     //char* buffer = new char[lSize];
@@ -86,27 +88,29 @@ int main (int argc, char* argv[])
     // Получение времени начала работы
     gettimeofday(&tvStart, NULL);
 
-int rank, size;
- 
-  MPI_Init (&argc, &argv);      /* starts MPI */
-  MPI_Comm_rank (MPI_COMM_WORLD, &rank);        /* get current process id */
-  MPI_Comm_size (MPI_COMM_WORLD, &size);        /* get number of processes */
-  
+    MPI_Init(&argc, &argv);      /* starts MPI */
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);        /* get current process id */
+    MPI_Comm_size(MPI_COMM_WORLD, &size);        /* get number of processes */
+
+    frameSize = lSize / (size - 1);
+
     generateWordsFreq(buffer);
-     MPI_Finalize();
+    if (rank == 0) {
+        // Получение времени конца работы
+        gettimeofday(&tvFinish, NULL);
+        long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
+        long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
 
-    // Получение времени конца работы
-    gettimeofday(&tvFinish, NULL);
-    long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
-    long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
+        printf("%ld\n", msFinish - msStart);
 
-    printf("%ld\n", msFinish - msStart);
+//        printResult();
+    }
 
-    printResult();
+    MPI_Finalize();
 
     fclose(file);
-    
-    
+
+
     delete (buffer);
     delete (wordsVector);
     delete (wordsMap);
@@ -181,30 +185,41 @@ void generateWordsFreq(const char *inputString) {
 
     long counterFrom = 0;
     long counterTo = 0;
-    
-    std::vector
 
-    while (counterTo < (lSize - 1)) {
-        counterTo += frameSize;
-        
-        while (inputString[counterTo] != ' ' && inputString[counterTo] != 0 && counterTo < lSize)
-            counterTo++;
+    if (rank == 0) {
+        int i = 1;
+        while (i < size) {
 
-        if (counterTo > lSize)
-            counterTo = lSize - 1;
-            
-        char *workArray = new char[counterTo - counterFrom + 1];
-        
-        for(int i=0;i < counterTo - counterFrom + 1;i++)
-			workArray[i] = 0;
+            counterTo += frameSize;
+            while (inputString[counterTo] != ' ' && counterTo < lSize)
+                counterTo++;
 
-        strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
+            if (counterTo > lSize)
+                counterTo = lSize - 1;
 
-        counterFrom = counterTo + 1;
+            char *workArray = new char[counterTo - counterFrom + 1];
 
-        countWoldIncludes(workArray);
-        
-        free(workArray);
+            for (int i = 0; i < counterTo - counterFrom + 1; i++)
+                workArray[i] = 0;
+
+            strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
+            counterFrom = counterTo + 1;
+
+            //countWoldIncludes(workArray);
+            printf("Proc %d start send mes to %d\n",rank,i);
+            MPI::COMM_WORLD.Send(workArray, counterTo - counterFrom + 1, MPI::CHAR, i, 1);
+            printf("Proc %d finish send mes to %d\n",rank,i);
+
+            i++;
+            //delete (workArray);
+        }
+    }
+    else {
+        char *i_buffer = new char[frameSize * 2];
+        printf("Proc %d wait mes\n",rank);
+        MPI::COMM_WORLD.Recv(i_buffer, frameSize * 2, MPI::CHAR, 0, 1, status);
+        int count = status.Get_count ( MPI::CHAR );
+        printf("Proc %d receive mes %d\n",rank,count);
     }
 }
 
