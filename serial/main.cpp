@@ -144,7 +144,7 @@ void countWoldIncludes(char *workCharArr) {
     std::map<std::string, int> *wMap = new std::map<std::string, int>;
     std::vector<std::string> *wVector = new std::vector<std::string>;
 
-    char *pch = std::strtok(workCharArr, " ,. \"!?()\n");
+    char *pch = std::strtok(workCharArr, " ,.: \"!?()\n\t");
 
     while (pch != NULL) {
         if (wMap->count(pch)) {
@@ -156,7 +156,7 @@ void countWoldIncludes(char *workCharArr) {
             wMap->insert(std::pair<std::string, int>(pch, 1));
             wVector->push_back(pch);
         }
-        pch = strtok(NULL, " ,. \"!?()\n");
+        pch = strtok(NULL, " ,.: \"!?()\n\t");
     }
 
     addNewMapAndVector(wMap, wVector);
@@ -175,14 +175,16 @@ void generateWordsFreq(const char *inputString) {
     while (counterTo < (lSize - 1)) {
 
         counterTo += frameSize;
-        while (inputString[counterTo] != ' ' && inputString[counterTo] != 0)
+        while (inputString[counterTo] != ' ' && counterTo < lSize)
             counterTo++;
 
         if (counterTo > lSize)
             counterTo = lSize - 1;
 
         char *workArray = new char[counterTo - counterFrom + 1];
-        workArray[frameSize] = '\0';
+
+        for(int i=0;i<counterTo - counterFrom + 1 ;i++)
+            workArray[i] = 0;
 
         strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
 

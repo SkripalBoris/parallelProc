@@ -173,8 +173,6 @@ void countWoldIncludes(char *workCharArr) {
         pch = strtok(NULL, " ,. \"!?()\n");
     }
 
-    addNewMapAndVector(wMap, wVector);
-
     delete (wMap);
     delete (wVector);
 }
@@ -203,23 +201,43 @@ void generateWordsFreq(const char *inputString) {
                 workArray[i] = 0;
 
             strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
-            counterFrom = counterTo + 1;
+
 
             //countWoldIncludes(workArray);
-            printf("Proc %d start send mes to %d\n",rank,i);
             MPI::COMM_WORLD.Send(workArray, counterTo - counterFrom + 1, MPI::CHAR, i, 1);
-            printf("Proc %d finish send mes to %d\n",rank,i);
 
+            counterFrom = counterTo + 1;
             i++;
-            //delete (workArray);
+
+            delete (workArray);
         }
     }
     else {
         char *i_buffer = new char[frameSize * 2];
-        printf("Proc %d wait mes\n",rank);
         MPI::COMM_WORLD.Recv(i_buffer, frameSize * 2, MPI::CHAR, 0, 1, status);
         int count = status.Get_count ( MPI::CHAR );
         printf("Proc %d receive mes %d\n",rank,count);
+    }
+
+    if(rank == 0) {
+        for(int i=1;i<size;i++) {
+            std::map<std::string, int> *wMap = new std::map<std::string, int>;
+            std::vector<std::string> *wVector = new std::vector<std::string>;
+
+            int goFlag = 0;
+
+            while(!goFlag) {
+                char *i_buffer = new char[frameSize];
+                MPI::COMM_WORLD.Recv(i_buffer, frameSize, MPI::CHAR, i, 1, status);
+                int count = status.Get_count(MPI::CHAR);
+                if(i_buffer[0] == '.') {
+                    goFlag++;
+                } else {
+                    int bu
+                }
+            }
+
+        }
     }
 }
 

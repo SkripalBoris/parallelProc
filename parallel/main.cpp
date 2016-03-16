@@ -195,7 +195,8 @@ void *countWoldIncludes(void *arg) {
 
     delete (wMap);
     delete (wVector);
-//    free (workCharArr);
+    delete (workCharArr);
+    delete (pch);
 }
 
 void generateWordsFreq(const char *inputString) {
@@ -209,15 +210,20 @@ void generateWordsFreq(const char *inputString) {
     while (counterTo < (lSize - 1)) {
         if (counterTo == (lSize - 1))
             break;
-        char *workArray = new char[frameSize + 1];
-        workArray[frameSize] = '\0';
 
         counterTo += frameSize;
-        while (inputString[counterTo] != ' ')
+        while (inputString[counterTo] != ' ' && counterTo < lSize)
             counterTo++;
 
         if (counterTo > lSize)
             counterTo = lSize - 1;
+
+        char *workArray = new char[counterTo - counterFrom + 1];
+
+        for(int i=0; i< counterTo - counterFrom + 1; i++) {
+            workArray[i] = 0;
+        }
+        //workArray[frameSize] = '\0';
 
         strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
 
