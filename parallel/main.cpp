@@ -169,7 +169,7 @@ void *countWoldIncludes(void *arg) {
 
     char *saveptr;
 
-    char *pch = strtok_r(workCharArr, " ,. \"!?()\n", &saveptr);
+    char *pch = strtok_r(workCharArr, " ,.: \"!?()\n", &saveptr);
 
     int i = 0;
     while (pch != NULL) {
@@ -183,7 +183,7 @@ void *countWoldIncludes(void *arg) {
             wMap->insert(std::pair<std::string, int>(pch, 1));
             wVector->push_back(pch);
         }
-        pch = strtok_r(NULL, " ,. \"!?()\n", &saveptr);
+        pch = strtok_r(NULL, " ,.: \"!?()\n", &saveptr);
     }
 
     // устанавливаем блокировку
