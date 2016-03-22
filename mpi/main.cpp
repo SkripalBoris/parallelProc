@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
         printf("%ld\n", msFinish - msStart);
 
-//        printResult();
+        printResult();
     }
 
     MPI_Finalize();
@@ -158,7 +158,7 @@ void countWoldIncludes(char *workCharArr) {
     std::map<std::string, int> *wMap = new std::map<std::string, int>;
     std::vector<std::string> *wVector = new std::vector<std::string>;
 
-    char *pch = std::strtok(workCharArr, " ,. \"!?()\n");
+    char *pch = std::strtok(workCharArr, " ,:. \"!?()\n");
 
     while (pch != NULL) {
         if (wMap->count(pch)) {
@@ -170,9 +170,27 @@ void countWoldIncludes(char *workCharArr) {
             wMap->insert(std::pair<std::string, int>(pch, 1));
             wVector->push_back(pch);
         }
-        pch = strtok(NULL, " ,. \"!?()\n");
+        pch = strtok(NULL, " ,:. \"!?()\n");
     }
 
+  //  printf("Start generate string\n");
+    std::string sendString="";
+    for (std::vector<std::string>::iterator it = wVector->begin(); it != wVector->end(); ++it) {
+      std::string bufString = *it;
+      char bufNumber[20];
+      int bufNum = wMap->at(*it);
+      sprintf(bufNumber,"%d",bufNum);
+      std::string intString(bufNumber);
+      sendString = sendString + ' ' + bufString + ' ' + intString;
+    }
+
+    //printf("Start send recv %s\n",sendString.c_str());
+
+    int string_lenght = sendString.size()+1;
+    MPI::COMM_WORLD.Send(&string_lenght,1,MPI::INT,0,0);
+    MPI::COMM_WORLD.Send(sendString.c_str(), string_lenght, MPI::CHAR, 0, 1);
+
+//printf("finish send recv\n");
     delete (wMap);
     delete (wVector);
 }
@@ -204,7 +222,10 @@ void generateWordsFreq(const char *inputString) {
 
 
             //countWoldIncludes(workArray);
-            MPI::COMM_WORLD.Send(workArray, counterTo - counterFrom + 1, MPI::CHAR, i, 1);
+            //printf("Sends start string\n");
+            int string_lenght = counterTo - counterFrom + 1;
+            MPI::COMM_WORLD.Send(&string_lenght,1,MPI::INT,i,0);
+            MPI::COMM_WORLD.Send(workArray, string_lenght, MPI::CHAR, i, 1);
 
             counterFrom = counterTo + 1;
             i++;
@@ -213,10 +234,13 @@ void generateWordsFreq(const char *inputString) {
         }
     }
     else {
-        char *i_buffer = new char[frameSize * 2];
-        MPI::COMM_WORLD.Recv(i_buffer, frameSize * 2, MPI::CHAR, 0, 1, status);
+        int frameLenght;
+          MPI::COMM_WORLD.Recv(&frameLenght, 1, MPI::INT, 0, 0, status);
+        char *i_buffer = new char[frameLenght];
+        MPI::COMM_WORLD.Recv(i_buffer, frameLenght, MPI::CHAR, 0, 1, status);
         int count = status.Get_count ( MPI::CHAR );
-        printf("Proc %d receive mes %d\n",rank,count);
+        //printf("Proc %d receive mes %d count %d\n",rank,count,frameLenght);
+        countWoldIncludes(i_buffer);
     }
 
     if(rank == 0) {
@@ -224,19 +248,25 @@ void generateWordsFreq(const char *inputString) {
             std::map<std::string, int> *wMap = new std::map<std::string, int>;
             std::vector<std::string> *wVector = new std::vector<std::string>;
 
-            int goFlag = 0;
-
-            while(!goFlag) {
-                char *i_buffer = new char[frameSize];
+// Принимаем строку с количеством слов
+            //printf("start recv %d\n",i);
+              int frameLenght;
+                MPI::COMM_WORLD.Recv(&frameLenght, 1, MPI::INT, i, 0, status);
+                char *i_buffer = new char[frameLenght];
                 MPI::COMM_WORLD.Recv(i_buffer, frameSize, MPI::CHAR, i, 1, status);
-                int count = status.Get_count(MPI::CHAR);
-                if(i_buffer[0] == '.') {
-                    goFlag++;
-                } else {
-                    int bu
-                }
-            }
 
+              char *pch = std::strtok(i_buffer, " ,. \"!?()\n");
+              while (pch != NULL) {
+                  std::string b(pch);
+                  wVector->push_back(b);
+                  pch = strtok(NULL, " ,. \"!?()\n");
+
+                  std::string buf = wVector->back();
+                  wMap->insert(std::pair<std::string, int>(buf,atoi(pch)));
+                  pch = strtok(NULL, " ,. \"!?()\n");
+              }
+
+              addNewMapAndVector(wMap,wVector);
         }
     }
 }
