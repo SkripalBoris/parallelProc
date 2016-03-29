@@ -9,8 +9,6 @@
 #include <stdlib.h>
 
 /**********************************************************************************************************************/
-#define RECOMENDED_THREADS_NUMBER 4
-/**********************************************************************************************************************/
 /*
  * Глобальная мапа с количеством повторений слов
  */
@@ -39,6 +37,10 @@ long frameSize;
  * Размер считаных символов
  */
 long lSize;
+/*
+ * Количество потоков
+ */
+int threadNumber;
 
 /**********************************************************************************************************************/
 /*
@@ -65,7 +67,7 @@ void printResult();
 
 /**********************************************************************************************************************/
 int main(int argc, char *argv[]) {
-	if (argc == 1) {
+	if (argc < 3) {
 		printf("Please write filename in parameter\n");
 		return 1;
 	}
@@ -75,8 +77,10 @@ int main(int argc, char *argv[]) {
 	createThreadsCounter = 0;
 	finishThreadsCounter = 0;
 
+	threadNumber = atoi(argv[1]);
+	
 	//Открытие файла
-	FILE *file = fopen(argv[1], "r");
+	FILE *file = fopen(argv[2], "r");
 
 	if (file == NULL) {
 		perror("File error");
@@ -85,7 +89,7 @@ int main(int argc, char *argv[]) {
 
 	fseek(file, 0, SEEK_END);
 	lSize = (size_t)ftell(file);
-	frameSize = lSize / RECOMENDED_THREADS_NUMBER + 1;
+	frameSize = lSize / threadNumber + 1;
 	rewind(file);
 
 	//char* buffer = new char[lSize];

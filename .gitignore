@@ -2,3 +2,7 @@
 /lab1/dist/
 /lab2/build/
 /lab2/dist/
+testReports/
+workMPI
+workSerial
+workThreads

@@ -23,9 +23,9 @@ for i in $TEST_FILES ; do
     echo "Start serial programm for test file $i"
     $RDIR/workSerial $TEST_DIR/$i > $REPORT_DIR/"$i".result.serial
     echo "Start thread programm for test file $i"
-    $RDIR/workThreads $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
+    $RDIR/workThreads 4 $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
     echo "Start mpi programm for test file $i"
-    mpirun -np 1 $RDIR/workMPI $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
+    mpirun -np 4 $RDIR/workMPI $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
 done
 
 # Сравнение результатов
