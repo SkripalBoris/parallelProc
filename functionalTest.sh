@@ -124,7 +124,7 @@ COUNTER=0
 
 echo "Start pthreads programm with 2 thread repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    mpirun -np 5 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.4.repeate
+    mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.4.repeate
     let COUNTER=COUNTER+1 
 done
 echo "Done"

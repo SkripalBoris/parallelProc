@@ -8,13 +8,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-/**********************************************************************************************************************/
+/**********************************************************************/
 /*
- * Глобальная мапа с количеством повторений слов
+ * Global map with words
  */
 std::map<std::string, int> *wordsMap;
 /*
- * Глобальный вектор со словами
+ * Global vector with words
  */
 std::vector<std::string> *wordsVector;
 /*
@@ -22,50 +22,46 @@ std::vector<std::string> *wordsVector;
  */
 int createThreadsCounter;
 /*
- * Количество отработавших потоков
+ * Number of finish threads
  */
 int finishThreadsCounter;
 /*
- * Исключающая блокировка
+ * Mutex
  */
 pthread_mutex_t lock;
 /*
- * Размер окна
+ *	Frame size
  */
 long frameSize;
 /*
- * Размер считаных символов
+ * Number of readed words
  */
 long lSize;
 /*
- * Количество потоков
+ * Number of threads
  */
 int threadNumber;
 
-/**********************************************************************************************************************/
+/**********************************************************************/
 /*
- * Функция добавления новых значений в глобальные структуры
+ * Add new words into global map and vector
  */
 void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
 	std::vector<std::string> *newKeysVector);
 
 /*
- * Функция подсчета слов в строке
- * В качестве параметра передается указатель на массив символов
+ * Count words includes in text string
  */
 void *countWoldIncludes(void *arg);
 
 /*
- * Функция генерации потоков
+ * Generation text frames
  */
 void generateWordsFreq(const char *inputString);
 
-/*
- * Печать результатов
- */
 void printResult();
 
-/**********************************************************************************************************************/
+/**********************************************************************/
 int main(int argc, char *argv[]) {
 	if (argc < 3) {
 		printf("Please write filename in parameter\n");
@@ -79,7 +75,6 @@ int main(int argc, char *argv[]) {
 
 	threadNumber = atoi(argv[1]);
 	
-	//Открытие файла
 	FILE *file = fopen(argv[2], "r");
 
 	if (file == NULL) {
@@ -92,25 +87,23 @@ int main(int argc, char *argv[]) {
 	frameSize = lSize / threadNumber + 1;
 	rewind(file);
 
-	//char* buffer = new char[lSize];
 	char *buffer = (char *)malloc((size_t)lSize);
 	fread(buffer, 1, lSize, file);
 
-	// инициализация исключающей блокировки
+	// init mutex
 	if (pthread_mutex_init(&lock, NULL) != 0) {
 		printf("\n mutex init failed\n");
 		return 1;
 	}
 
-	// Инициализация счетчика
 	struct timeval tvStart;
 	struct timeval tvFinish;
 
-	// Получение времени начала работы
+	// Get time of start programm
 	gettimeofday(&tvStart, NULL);
 	generateWordsFreq(buffer);
 
-	// Получение времени конца работы
+	// Get time of finish programm
 	gettimeofday(&tvFinish, NULL);
 	long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
 	long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
@@ -118,7 +111,7 @@ int main(int argc, char *argv[]) {
 	printf("%ld\n", msFinish - msStart);
 	printResult();
 
-	//Удаляем исключающую блокировку
+	// Delete mutex
 	pthread_mutex_destroy(&lock);
 	fclose(file);
 	delete (buffer);
@@ -190,11 +183,11 @@ void *countWoldIncludes(void *arg) {
 		pch = strtok_r(NULL, " ,.: \"!?()\n", &saveptr);
 	}
 
-	// устанавливаем блокировку
+	// on mutex
 	pthread_mutex_lock(&lock);
 	addNewMapAndVector(wMap, wVector);
 	finishThreadsCounter++;
-	// снимаем блокировку
+	// off mutex
 	pthread_mutex_unlock(&lock);
 
 	delete (wMap);
@@ -232,10 +225,10 @@ void generateWordsFreq(const char *inputString) {
 		counterFrom = counterTo + 1;
 
 		pthread_t thread;
-		//создаем поток для вычислений
+		// create threads
 		createThreadsCounter++;
 		pthread_create(&thread, NULL, countWoldIncludes, (void *)workArray);
-		// переводим в отсоединенный режим
+		// detach threads
 		pthread_detach(thread);
 	}
 

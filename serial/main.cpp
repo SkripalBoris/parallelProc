@@ -5,53 +5,49 @@
 #include <string>
 #include <unistd.h>
 #include <sys/time.h>
-#include <pthread.h>
 #include <stdlib.h>
 
-/**********************************************************************************************************************/
-#define RECOMENDED_THREADS_NUMBER 3
-/**********************************************************************************************************************/
+/**********************************************************************/
+
 /*
- * Глобальная мапа с количеством повторений слов
+ * Global map with words
  */
 std::map<std::string, int> *wordsMap;
 /*
- * Глобальный вектор со словами
+ * Global vector with words
  */
 std::vector<std::string> *wordsVector;
 /*
- * Размер окна
+ * Text frame size
  */
 long frameSize;
 /*
- * Размер считаных символов
+ * Number of readed words
  */
 long lSize;
 
-/**********************************************************************************************************************/
+/**********************************************************************/
+
 /*
- * Функция добавления новых значений в глобальные структуры
+ * Add new words into global map and vector
  */
 void addNewMapAndVector(std::map<std::string, int> *newCounterMap,
 	std::vector<std::string> *newKeysVector);
 
 /*
- * Функция подсчета слов в строке
- * В качестве параметра передается указатель на массив символов
+ * Count words includes in text string
  */
 void countWoldIncludes(char *workCharArr);
 
 /*
- * Функция генерации потоков
+ * Generation text frames
  */
 void generateWordsFreq(const char *inputString);
 
-/*
- * Печать результатов
- */
 void printResult();
 
-/**********************************************************************************************************************/
+/**********************************************************************/
+
 int main(int argc, char *argv[]) {
 	if (argc == 1) {
 		printf("Please write filename in parameter\n");
@@ -61,7 +57,6 @@ int main(int argc, char *argv[]) {
 	wordsMap = new std::map<std::string, int>;
 	wordsVector = new std::vector<std::string>;
 
-	//Открытие файла
 	FILE *file = fopen(argv[1], "r");
 
 	if (file == NULL) {
@@ -71,22 +66,20 @@ int main(int argc, char *argv[]) {
 
 	fseek(file, 0, SEEK_END);
 	lSize = (size_t)ftell(file);
-	frameSize = lSize / RECOMENDED_THREADS_NUMBER + 1;
+	frameSize = lSize;
 	rewind(file);
 
-	//char* buffer = new char[lSize];
 	char *buffer = (char *)malloc((size_t)lSize);
 	fread(buffer, 1, lSize, file);
 
-	// Инициализация счетчика
 	struct timeval tvStart;
 	struct timeval tvFinish;
 
-	// Получение времени начала работы
+	// Get time of start programm
 	gettimeofday(&tvStart, NULL);
 	generateWordsFreq(buffer);
 
-	// Получение времени конца работы
+	// Get time of finish programm
 	gettimeofday(&tvFinish, NULL);
 	long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
 	long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
