@@ -1,0 +1,303 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\voffset -24.5mm
+\hoffset -5mm
+\textwidth 173mm
+\textheight 240mm
+\oddsidemargin=0mm \evensidemargin=0mm
+
+\lstdefinestyle{CppCodeStyle}{
+	basicstyle=\footnotesize\ttfamily,
+	language={[ANSI]C++},
+	keywordstyle=\bfseries,
+	showstringspaces=false,
+	morekeywords={include, printf},
+	commentstyle={},
+	texcl=true,
+	frame=single,
+	breaklines=true,
+	extendedchars=\true
+}
+
+\begin{document}
+	\input{titlepage.tex}
+	
+	\renewcommand{\thesection}{\arabic{section}}
+	\tableofcontents
+	\pagebreak
+	
+	\setcounter{totalnumber}{10}
+	\setcounter{topnumber}{10}
+	\setcounter{bottomnumber}{10}
+	\renewcommand{\topfraction}{1}
+	\renewcommand{\textfraction}{0}
+	
+	\section{Постановка задачи}
+		Реализовать программу, подсчитывающую количество русских слов в тексте при помощи трех технологий:
+		\begin{enumerate}
+			\item Последовательная реализация;
+			\item Параллельная реализация при помощи POSIX threads;
+			\item Параллельная реализация при помощи технологии MPI.
+		\end{enumerate}
+		Сравнить времена выполнения программ, в зависимости от окружения, а так же от количества потоков (процессов) для вариантов 2 и 3.
+	\section{Реализация}
+		\subsection{Последовательное выполнение}
+			\subsubsection{Описание алгоритма}
+				В качестве параметров программе передается имя файла с текстом. После чего программа выдает результат в следующем формате: в первой строке вывода будет записано время выполнения программы в миллисекундах, после чего выводится количество повторений слов в формате \textit{"Слово Количество\_повторений"}.
+				
+				Программа работает по следующему алгоритму:
+				\begin{enumerate}
+					\item Анализ входных параметров для получения имени файла.
+					\item Инициализируем глобальный вектор для хранения слов и map для хранения повторений слов.
+					\item Считываем входной файл в массив типа char.
+					\item Инициализируем таймер и получаем время начала работы программы.
+					\item Последовательно берем каждое новое слово в строке, до тех пор, пока не закончится строка и:
+						\begin{itemize}
+							\item Если слово не находится в векторе встреченных слов, то добавляем его в вектор и добавляем в map пару типа \textit{Новое\_слово 1}.
+							\item Если слово находится в векторе, то увеличиваем соответствующее значение в map на 1.
+						\end{itemize}
+					\item Считываем время завершения работы и находим время выполнения.
+					\item Выводим время выполнения, а так же содержимое map и вектора.
+				\end{enumerate}
+			\subsubsection{Исходный код}
+			\lstinputlisting[style={CppCodeStyle}]{../serial/main.cpp}
+			\subsection{Выполнение при помощи pthreads}
+				\subsubsection{Описание алгоритма}
+					В качестве параметров программе передается количество потоков и имя файла с текстом. После чего программа выдает результат в следующем формате: в первой строке вывода будет записано время выполнения программы в миллисекундах, после чего выводится количество повторений слов в формате \textit{"Слово Количество\_повторений"}.
+					
+					Программа работает по следующему алгоритму:
+					\begin{enumerate}
+						\item Анализ входных параметров для получения имени файла и количество потоков.
+						\item Инициализируем глобальный вектор для хранения слов и map для хранения повторений слов, а так же мьютекс для обеспечения совместного доступа к глобальным переменным.
+						\item Считываем входной файл в массив типа char.
+						\item Инициализируем таймер и получаем время начала работы программы.
+						\item Разбиваем входной массив на n (n - количество потоков), массивов примерно одинаковой длинны. Для этого входную строку делим на n равных частей, после чего смещаем каждую границу до первого разделяющего символа (пробела, точки, запятой и т.д.).
+						\item Для каждого из потоков запускаем функцию подсчета количества слов и переводим его в отсоединенный режим:
+						\begin{enumerate}
+							\item Инициализируем локальные вектор и карту для подсчета слов.
+							\item Последовательно берем каждое новое слово в строке, до тех пор, пока не закончится строка и:
+							\begin{itemize}
+								\item Если слово не находится в векторе встреченных слов, то добавляем его в вектор и добавляем в map пару типа \textit{Новое\_слово 1}.
+								\item Если слово находится в векторе, то увеличиваем соответствующее значение в map на 1.
+							\end{itemize}
+							\item Переводим мьютекс в заблокированное состояние.
+							\item Объединяем локальные вектор и карту с глобальными вектором и картой.
+							\item Разблокируем мьютекс.
+						\end{enumerate}
+						\item Ожидаем завершения всех потоков.
+						\item Считываем время завершения работы и находим время выполнения.
+						\item Выводим время выполнения, а так же содержимое map и вектора.
+					\end{enumerate}
+				\subsubsection{Исходный код}
+					\lstinputlisting[style={CppCodeStyle}]{../parallel/main.cpp}
+			\subsection{Выполнение при помощи mpi}
+				\subsubsection{Описание алгоритма}
+					В качестве параметров программе передается количество процессов и имя файла с текстом. После чего программа выдает результат в следующем формате: в первой строке вывода будет записано время выполнения программы в миллисекундах, после чего выводится количество повторений слов в формате \textit{"Слово Количество\_повторений"}.
+					
+					Программа работает по следующему алгоритму:
+					\begin{enumerate}
+						\item Анализ входных параметров для получения имени файла и количества процессов.
+						\item Инициализируем глобальный вектор для хранения слов и map для хранения повторений слов.
+						\item Считываем входной файл в массив типа char.
+						\item Инициализируем таймер и получаем время начала работы программы.
+						\item При помощи функции \textit{MPI\_Init} разбиваем процесс на несколько процессов. При этом процесс с ID 0 будет "мастером", а остальные процессы будут "служебными". После чего для каждого из типов процессов будет свой алгоритм выполнения.
+						\item Процесс-мастер:
+							\begin{enumerate}
+								\item Разбиваем входную строку на n (n - количество служебных процессов) по такому же принципу, как в многопоточной программе.
+								\item Передаем каждому из служебных процессов последовательно два сообщения:
+									\begin{itemize}
+										\item Размер строки, которую собираемся передать.
+										\item Подстроку, которую будет обрабатывать этот служебный процесс.
+									\end{itemize}
+								\item Получаем от каждого из служебного процесса последовательно следующие сообщения:
+									\begin{itemize}
+										\item Размер строки, которую собираемся передать.
+										\item Подстроку с результатом подсчета слов формата \textit{Слово Количество\_повторений}.
+									\end{itemize}
+								\item Разбираем строку и обновляем глобальные вектор и карту по аналогии с последовательной программой.
+								\item Выводим время завершения обработки.
+								\item Выводим результаты.
+							\end{enumerate}
+						\item Служебный процесс:
+							\begin{enumerate}
+								\item Получаем от процесса мастера сообщение с длинной строки, которую необходимо принять и инициализируем память по эту строку.
+								\item Получаем строку с текстом.
+								\item Инициализируем локальные вектор и карту для подсчета слов.
+								\item Последовательно берем каждое новое слово в строке, до тех пор, пока не закончится строка и:
+									\begin{itemize}
+										\item Если слово не находится в векторе встреченных слов, то добавляем его в вектор и добавляем в map пару типа \textit{Новое\_слово 1}.
+										\item Если слово находится в векторе, то увеличиваем соответствующее значение в map на 1.
+									\end{itemize}
+								\item Превращаем вектор и карту в строку вида \textit{"Слово Количество\_повторений"}.
+								\item Отправляем процессу-мастеру сообщение с длинной полученной строки.
+								\item Отправляем процессу-мастеру сообщение с созданной строкой.
+							\end{enumerate}
+					\end{enumerate}
+				\subsubsection{Исходный код}
+					\lstinputlisting[style={CppCodeStyle}]{../mpi/main.cpp}
+		\section{Тестирование производительности программ}
+			Для автоматизации тестирования производительности было решено написать следующий скрипт:
+			\begin{verbatim}
+				#!/bin/bash
+				
+				RDIR=`pwd`
+				TEST_DIR="$RDIR/testFiles"
+				TEST_FILES="test1.txt"
+				REPORT_DIR="$RDIR/testReports"
+				
+				# Количество повторений
+				let COUNTER_VAR=50
+				
+				# Подотовка директорий
+				
+				echo "Create report dir $RDIR"
+				
+				if [ -d $REPORT_DIR ] ; then
+				rm -R $REPORT_DIR
+				fi
+				mkdir $REPORT_DIR
+				
+				# Сборка задач
+				make clean
+				make
+				
+				# Запуск задач
+				for i in $TEST_FILES ; do
+				echo "Start serial programm for test file $i"
+				$RDIR/workSerial $TEST_DIR/$i > $REPORT_DIR/"$i".result.serial
+				echo "Start thread programm for test file $i"
+				$RDIR/workThreads 4 $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
+				echo "Start mpi programm for test file $i"
+				mpirun -np 4 $RDIR/workMPI $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
+				done
+				
+				# Сравнение результатов
+				for i in $TEST_FILES ; do
+				cat $REPORT_DIR/"$i".result.serial | sort > $REPORT_DIR/"$i".result.serial.tmp
+				mv $REPORT_DIR/"$i".result.serial.tmp $REPORT_DIR/"$i".result.serial
+
+				cat $REPORT_DIR/"$i".result.thread | sort > $REPORT_DIR/"$i".result.thread.tmp
+				mv $REPORT_DIR/"$i".result.thread.tmp $REPORT_DIR/"$i".result.thread
+				
+				cat $REPORT_DIR/"$i".result.mpi | sort > $REPORT_DIR/"$i".result.mpi.tmp
+				mv $REPORT_DIR/"$i".result.mpi.tmp $REPORT_DIR/"$i".result.mpi
+				
+				diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.thread >
+				  $REPORT_DIR/"$i".diff.serial.thread
+				diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.mpi >
+				  $REPORT_DIR/"$i".diff.serial.mpi
+				done
+				
+				# Многократный запуск для последующего рассчета СКО и т.д.
+				
+				TEST_FILE=test1.txt
+				
+				# Подготовка
+				find -name *.repeate | xargs rm -f
+				
+				# Последовательная программа
+				COUNTER=0
+				
+				echo "Start serial programm repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				$RDIR/workSerial $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.serial.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# Параллельная программа с 1 потоком
+				COUNTER=0
+				
+				echo "Start pthreads programm with 1 thread repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				$RDIR/workThreads 1 $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.threads.1.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# Параллельная программа с 2 потоками
+				COUNTER=0
+				
+				echo "Start pthreads programm with 2 thread repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				$RDIR/workThreads 2 $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.threads.2.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# Параллельная программа с 4 потоками
+				COUNTER=0
+				
+				echo "Start pthreads programm with 2 thread repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				$RDIR/workThreads 4 $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.threads.4.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# MPI с 1 рабочим процессом
+				COUNTER=0
+				
+				echo "Start mpi programm with 1 process repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				mpirun -np 2 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.mpi.1.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# MPI с 2 рабочими процессами
+				COUNTER=0
+				
+				echo "Start mpi programm with 2 process repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				mpirun -np 3 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.mpi.2.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+				
+				# MPI с 3 рабочими процессами
+				COUNTER=0
+				
+				echo "Start mpi programm with 4 process repeating..."
+				while [ $COUNTER -lt $COUNTER_VAR ] ; do
+				mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+				  $REPORT_DIR/result.mpi.4.repeate
+				let COUNTER=COUNTER+1 
+				done
+				echo "Done"
+				echo ""
+			\end{verbatim}
+			Скрипт работает по следующему алгоритму:
+			\begin{enumerate}
+				\item Очищаем прошлые результаты.
+				\item Подготавливаем директории для результатов теста.
+				\item Выполняем сборку задач.
+				\item Для каждого из тестовых файлов выполняем:
+					\begin{enumerate}
+						\item Запускаем последовательную программу и записываем результат выполнения в файл \textit{Тестовая\_директория/Имя\_файла.result.serial}.
+						\item Запускаем параллельную программу с 4 потоками и записываем результат выполнения в файл \textit{Тестовая\_директория/Имя\_файла.result.thread}.
+						\item Для проверки корректности работы программы находим разницу между результатами выполнения между последовательной и параллельной и последовательной и mpi программами и выводим их в файлы \textit{Тестовая\_директория/ Имя\_файла. diff .serial .thread} и \textit{Тестовая\_директория/ Имя\_файла .diff .serial .mpi} соответственно.
+					\end{enumerate}
+			\end{enumerate}
+\end{document}}
