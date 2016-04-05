@@ -152,6 +152,8 @@ done
 echo "Done"
 echo ""
 
+COUNTER=0
+
 echo "Start MPI programm with 5 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
     mpirun -np 5 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.5.repeate
@@ -160,6 +162,8 @@ done
 echo "Done"
 echo ""
 
+COUNTER=0
+
 echo "Start MPI programm with 9 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
     mpirun -np 9 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.9.repeate
@@ -167,6 +171,8 @@ while [ $COUNTER -lt $COUNTER_VAR ] ; do
 done
 echo "Done"
 echo ""
+
+COUNTER=0
 
 echo "Start MPI programm with 15 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
