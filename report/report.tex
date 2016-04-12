@@ -68,8 +68,9 @@
 					\item Считываем время завершения работы и находим время выполнения.
 					\item Выводим время выполнения, а так же содержимое map и вектора.
 				\end{enumerate}
-			\subsubsection{Исходный код}
-			\lstinputlisting[style={CppCodeStyle}]{../serial/main.cpp}
+				
+				Исходный код программы приведены в листинге 1.
+				
 			\subsection{Выполнение при помощи pthreads}
 				\subsubsection{Описание алгоритма}
 					В качестве параметров программе передается количество потоков и имя файла с текстом. После чего программа выдает результат в следующем формате: в первой строке вывода будет записано время выполнения программы в миллисекундах, после чего выводится количество повторений слов в формате \textit{"Слово Количество\_повторений"}.
@@ -97,8 +98,9 @@
 						\item Считываем время завершения работы и находим время выполнения.
 						\item Выводим время выполнения, а так же содержимое map и вектора.
 					\end{enumerate}
-				\subsubsection{Исходный код}
-					\lstinputlisting[style={CppCodeStyle}]{../parallel/main.cpp}
+				
+				Исходный код программы представлен в листинге 3.
+				
 			\subsection{Выполнение при помощи mpi}
 				\subsubsection{Описание алгоритма}
 					В качестве параметров программе передается количество процессов и имя файла с текстом. После чего программа выдает результат в следующем формате: в первой строке вывода будет записано время выполнения программы в миллисекундах, после чего выводится количество повторений слов в формате \textit{"Слово Количество\_повторений"}.
@@ -142,153 +144,14 @@
 								\item Отправляем процессу-мастеру сообщение с созданной строкой.
 							\end{enumerate}
 					\end{enumerate}
-				\subsubsection{Исходный код}
-					\lstinputlisting[style={CppCodeStyle}]{../mpi/main.cpp}
+				
+				Исходный код параллельной программы приведены в листинге 2.
+				
 		\section{Тестирование производительности программ}
 			\subsection{Программа тестирования}
-				Для автоматизации тестирования производительности было решено написать следующий скрипт:
-				\begin{verbatim}
-					#!/bin/bash
-					
-					RDIR=`pwd`
-					TEST_DIR="$RDIR/testFiles"
-					TEST_FILES="test1.txt"
-					REPORT_DIR="$RDIR/testReports"
-					
-					# Количество повторений
-					let COUNTER_VAR=50
-					
-					# Подотовка директорий
-					
-					echo "Create report dir $RDIR"
-					
-					if [ -d $REPORT_DIR ] ; then
-					rm -R $REPORT_DIR
-					fi
-					mkdir $REPORT_DIR
-					
-					# Сборка задач
-					make clean
-					make
-					
-					# Запуск задач
-					for i in $TEST_FILES ; do
-					echo "Start serial programm for test file $i"
-					$RDIR/workSerial $TEST_DIR/$i > $REPORT_DIR/"$i".result.serial
-					echo "Start thread programm for test file $i"
-					$RDIR/workThreads 4 $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
-					echo "Start mpi programm for test file $i"
-					mpirun -np 4 $RDIR/workMPI $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
-					done
-					
-					# Сравнение результатов
-					for i in $TEST_FILES ; do
-					cat $REPORT_DIR/"$i".result.serial | sort > $REPORT_DIR/"$i".result.serial.tmp
-					mv $REPORT_DIR/"$i".result.serial.tmp $REPORT_DIR/"$i".result.serial
-	
-					cat $REPORT_DIR/"$i".result.thread | sort > $REPORT_DIR/"$i".result.thread.tmp
-					mv $REPORT_DIR/"$i".result.thread.tmp $REPORT_DIR/"$i".result.thread
-					
-					cat $REPORT_DIR/"$i".result.mpi | sort > $REPORT_DIR/"$i".result.mpi.tmp
-					mv $REPORT_DIR/"$i".result.mpi.tmp $REPORT_DIR/"$i".result.mpi
-					
-					diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.thread >
-					  $REPORT_DIR/"$i".diff.serial.thread
-					diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.mpi >
-					  $REPORT_DIR/"$i".diff.serial.mpi
-					done
-					
-					# Многократный запуск для последующего рассчета СКО и т.д.
-					
-					TEST_FILE=test1.txt
-					
-					# Подготовка
-					find -name *.repeate | xargs rm -f
-					
-					# Последовательная программа
-					COUNTER=0
-					
-					echo "Start serial programm repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					$RDIR/workSerial $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.serial.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# Параллельная программа с 1 потоком
-					COUNTER=0
-					
-					echo "Start pthreads programm with 1 thread repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					$RDIR/workThreads 1 $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.threads.1.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# Параллельная программа с 2 потоками
-					COUNTER=0
-					
-					echo "Start pthreads programm with 2 thread repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					$RDIR/workThreads 2 $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.threads.2.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# Параллельная программа с 4 потоками
-					COUNTER=0
-					
-					echo "Start pthreads programm with 2 thread repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					$RDIR/workThreads 4 $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.threads.4.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# MPI с 1 рабочим процессом
-					COUNTER=0
-					
-					echo "Start mpi programm with 1 process repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					mpirun -np 2 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.mpi.1.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# MPI с 2 рабочими процессами
-					COUNTER=0
-					
-					echo "Start mpi programm with 2 process repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					mpirun -np 3 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.mpi.2.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-					
-					# MPI с 3 рабочими процессами
-					COUNTER=0
-					
-					echo "Start mpi programm with 4 process repeating..."
-					while [ $COUNTER -lt $COUNTER_VAR ] ; do
-					mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
-					  $REPORT_DIR/result.mpi.4.repeate
-					let COUNTER=COUNTER+1 
-					done
-					echo "Done"
-					echo ""
-				\end{verbatim}
+				Для автоматизации тестирования производительности было решено написать 
+				следующий скрипт (листинг 4).
+				
 				Скрипт работает по следующему алгоритму:
 				\begin{enumerate}
 					\item Очищаем прошлые результаты.
@@ -378,4 +241,179 @@
 				при создании большого количества процессов, каждый из которых сильно 
 				загружает ЦП, необходимо частое переключение контекстов, что 
 				значительно замедляет работу.
-\end{document}}
+			
+			\section{Вывод}
+			
+				Целью данной лабораторной работы было показать увеличение 
+				производительности при разбиение программы на несколько параллельно 
+				работающих частей.
+				
+				В результате работы было опробованы две технологии распараллеливания 
+				программы: pthreads и MPI. В результате, при оптимальных параметрах 
+				каждая из технологий дала прирост в производительности примерно в 3.5 
+				раз (при 4 рабочих потоках (процессах)), что является хорошим 
+				результатом.
+				
+				Для синхронизации параллельной работы в Pthreads были использованы 
+				мьютексы, а в MPI работа была организована при помощи создания главного 
+				процесса,	который организует работу подчиненных процессов.
+				
+				При увеличении количества потоков (процессов) скорость выполнения 
+				программы растет нелинейно из-за синхронизации потоков, а так же, 
+				экспериментально было выявлено, что наилучшие показатели, как для 
+				многопоточной, так и для MPI наилучшие показатели достигаются тогда, 
+				когда количество потоков (процессов) равно количеству ядер в 
+				компьютере. Так же стоит отметить, что при большом количестве потоков, 
+				многопоточная программа практически не получает прироста 
+				производительности. Программа, использующая технологию MPI, напротив, 
+				значительно замедляется при большом количестве процессов, что, 
+				во-первых, может быть вызвано процедурой планирования, а, во-вторых, 
+				задержкой при синхронизации и общением процессов.
+				
+				Для правильной оценки времени работы программы были произведены 
+				многократные запуски (около 50 раз для каждого случая), что бы 
+				исключить погрешности, например, вызванные процедурой планирования.
+				
+			\section{Листинги}
+
+				\lstinputlisting[style={CppCodeStyle},caption={Последовательна 
+				программа}]{../serial/main.cpp}
+			
+				\lstinputlisting[style={CppCodeStyle},caption={Параллельная 
+				программа при помощи pthreads}]{../mpi/main.cpp}
+			
+				\lstinputlisting[style={CppCodeStyle},caption={Параллельная 
+				программа при помощи MPI}]{../parallel/main.cpp}
+			
+				\begin{lstlisting}[language=bash,caption={bash version},texcl=true,
+				frame=single,
+				breaklines=true,
+				extendedchars=\true]
+#!/bin/bash
+	
+RDIR=`pwd`
+TEST_DIR="$RDIR/testFiles"
+TEST_FILES="test1.txt"
+REPORT_DIR="$RDIR/testReports"
+
+let COUNTER_VAR=50
+			
+echo "Create report dir $RDIR"
+	
+if [ -d $REPORT_DIR ] ; then
+rm -R $REPORT_DIR
+fi
+mkdir $REPORT_DIR
+			
+make clean
+make
+			
+for i in $TEST_FILES ; do
+echo "Start serial programm for test file $i"
+$RDIR/workSerial $TEST_DIR/$i > $REPORT_DIR/"$i".result.serial
+echo "Start thread programm for test file $i"
+$RDIR/workThreads 4 $TEST_DIR/$i > $REPORT_DIR/"$i".result.thread
+echo "Start mpi programm for test file $i"
+mpirun -np 4 $RDIR/workMPI $TEST_DIR/$i > $REPORT_DIR/"$i".result.mpi
+done
+		
+for i in $TEST_FILES ; do
+cat $REPORT_DIR/"$i".result.serial | sort > 
+$REPORT_DIR/"$i".result.serial.tmp
+mv $REPORT_DIR/"$i".result.serial.tmp $REPORT_DIR/"$i".result.serial
+			
+cat $REPORT_DIR/"$i".result.thread | sort > 
+$REPORT_DIR/"$i".result.thread.tmp
+mv $REPORT_DIR/"$i".result.thread.tmp $REPORT_DIR/"$i".result.thread
+	
+cat $REPORT_DIR/"$i".result.mpi | sort > $REPORT_DIR/"$i".result.mpi.tmp
+mv $REPORT_DIR/"$i".result.mpi.tmp $REPORT_DIR/"$i".result.mpi
+			
+diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.thread >
+$REPORT_DIR/"$i".diff.serial.thread
+diff $REPORT_DIR/"$i".result.serial $REPORT_DIR/"$i".result.mpi >
+$REPORT_DIR/"$i".diff.serial.mpi
+done
+			
+TEST_FILE=test1.txt
+		
+find -name *.repeate | xargs rm -f
+			
+COUNTER=0
+			
+echo "Start serial programm repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+$RDIR/workSerial $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.serial.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+			
+COUNTER=0
+			
+echo "Start pthreads programm with 1 thread repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+$RDIR/workThreads 1 $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.threads.1.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+			
+COUNTER=0
+			
+echo "Start pthreads programm with 2 thread repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+$RDIR/workThreads 2 $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.threads.2.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+			
+COUNTER=0
+			
+echo "Start pthreads programm with 2 thread repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+$RDIR/workThreads 4 $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.threads.4.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+		
+COUNTER=0
+			
+echo "Start mpi programm with 1 process repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+mpirun -np 2 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.mpi.1.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+			
+COUNTER=0
+			
+echo "Start mpi programm with 2 process repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+mpirun -np 3 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.mpi.2.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+		
+COUNTER=0
+		
+echo "Start mpi programm with 4 process repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >>
+$REPORT_DIR/result.mpi.4.repeate
+let COUNTER=COUNTER+1 
+done
+echo "Done"
+echo ""
+		\end{lstlisting}
+\end{document}
