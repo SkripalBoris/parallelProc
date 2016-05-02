@@ -91,9 +91,6 @@ int main(int argc, char *argv[]) {
 		gettimeofday(&tvFinish, NULL);
 		long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
 		long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
-
-		//printf("%ld\n", msFinish - msStart);
-
 		printResult();
 	}
 
@@ -183,7 +180,6 @@ void countWoldIncludes(char *workCharArr) {
 		sendString = sendString + ' ' + bufString + ' ' + intString;
 	}
 	
-	//TEST
 	gettimeofday(&tvFinish, NULL);
 		long int msStart = tvStart.tv_sec * 1000 + tvStart.tv_usec / 1000;
 		long int msFinish = tvFinish.tv_sec * 1000 + tvFinish.tv_usec / 1000;
@@ -224,14 +220,10 @@ void generateWordsFreq(const char *inputString) {
 				workArray[i] = 0;
 
 			strncpy(workArray, inputString + counterFrom, counterTo - counterFrom);
-			
-			//printf("start send string %d\n",i);
 
 			int string_lenght = counterTo - counterFrom + 1;
 			MPI::COMM_WORLD.Send(&string_lenght, 1, MPI::INT, i, 0);
 			MPI::COMM_WORLD.Send(workArray, string_lenght, MPI::CHAR, i, 1);
-			
-			//printf("finish send string %d\n",i);
 
 			counterFrom = counterTo + 1;
 			i++;
@@ -242,9 +234,7 @@ void generateWordsFreq(const char *inputString) {
 		for(int k=1;k<size;k++)
 		{
 			int string_lenght = 0;
-			//printf("start send %d\n",k);
 			MPI::COMM_WORLD.Send(&string_lenght, 1, MPI::INT, k, 0);
-			//printf("finish send %d\n",k);
 		}
 			
 	}
@@ -255,13 +245,8 @@ void generateWordsFreq(const char *inputString) {
 		MPI::COMM_WORLD.Recv(i_buffer, frameLenght, MPI::CHAR, 0, 1, status);
 		int count = status.Get_count(MPI::CHAR);
 		
-		//printf("start recv %d\n",rank);
 		MPI::COMM_WORLD.Recv(&frameLenght, 1, MPI::INT, 0, 0, status);
-		//printf("finish recv %d\n",rank);
-		
 		countWoldIncludes(i_buffer);
-		
-		//printf("%d %ld %ld\n",rank,msStart,msFinish);
 		
 		delete(i_buffer);
 	}
@@ -275,8 +260,8 @@ void generateWordsFreq(const char *inputString) {
 			std::map<std::string, int> *wMap = new std::map<std::string, int>;
 			std::vector<std::string> *wVector = new std::vector<std::string>;
 
-			MPI::COMM_WORLD.Recv(&timeStartArr[i-1], 1, MPI::INT, i, 3, status);
-			MPI::COMM_WORLD.Recv(&timeFinishArr[i-1], 1, MPI::INT, i, 4, status);
+			MPI::COMM_WORLD.Recv(&timeStartArr[i-1], 1, MPI::LONG, i, 3, status);
+			MPI::COMM_WORLD.Recv(&timeFinishArr[i-1], 1, MPI::LONG, i, 4, status);
 
 			// Get text string
 			int frameLenght;
