@@ -98,30 +98,30 @@ find -name *.repeate | xargs rm -f
 #echo ""
 
 # Параллельная программа с 8 потоками
-COUNTER=0
-
-echo "Start pthreads programm with 8 thread repeating..."
-while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    $RDIR/workThreads 8 $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.threads.8.repeate
-    let COUNTER=COUNTER+1
-done
-echo "Done"
-echo ""
-
-# Параллельная программа с 16 потоками
-COUNTER=0
-
-echo "Start pthreads programm with 16 thread repeating..."
-while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    $RDIR/workThreads 16 $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.threads.16.repeate
-    let COUNTER=COUNTER+1
-done
-echo "Done"
-echo ""
+#COUNTER=0
+#
+#echo "Start pthreads programm with 8 thread repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    $RDIR/workThreads 8 $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.threads.8.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
+#
+## Параллельная программа с 16 потоками
+#COUNTER=0
+#
+#echo "Start pthreads programm with 16 thread repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    $RDIR/workThreads 16 $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.threads.16.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
 
 # MPI с 1 рабочим процессом
 #COUNTER=0
-
+#
 #echo "Start MPI programm with 2 process repeating..."
 #while [ $COUNTER -lt $COUNTER_VAR ] ; do
 #    mpirun -np 2 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.1.repeate
@@ -129,7 +129,7 @@ echo ""
 #done
 #echo "Done"
 #echo ""
-
+#
 # MPI с 2 рабочими процессами
 #COUNTER=0
 #
@@ -140,13 +140,77 @@ echo ""
 #done
 #echo "Done"
 #echo ""
+#
+## MPI с 4 рабочими процессами
+#COUNTER=0
+#
+#echo "Start MPI programm with 4 process repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.4.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
+#
+#COUNTER=0
+#
+#echo "Start MPI programm with 5 process repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    mpirun -np 5 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.5.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
+#
+#COUNTER=0
+#
+#echo "Start MPI programm with 9 process repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    mpirun -np 9 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.9.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
+#
+#COUNTER=0
+#
+#echo "Start MPI programm with 15 process repeating..."
+#while [ $COUNTER -lt $COUNTER_VAR ] ; do
+#    mpirun -np 16 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.16.repeate
+#    let COUNTER=COUNTER+1
+#done
+#echo "Done"
+#echo ""
+
+# Модифицированная MPI программа
+# MPI с 1 рабочим процессом
+COUNTER=0
+
+echo "Start MPI programm with 2 process repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+    mpirun -np 2 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.1.repeate
+    let COUNTER=COUNTER+1
+done
+echo "Done"
+echo ""
+
+# MPI с 2 рабочими процессами
+COUNTER=0
+
+echo "Start MPI programm with 3 process repeating..."
+while [ $COUNTER -lt $COUNTER_VAR ] ; do
+    mpirun -np 3 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.2.repeate
+    let COUNTER=COUNTER+1
+done
+echo "Done"
+echo ""
 
 # MPI с 4 рабочими процессами
 COUNTER=0
 
 echo "Start MPI programm with 4 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    mpirun -np 4 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.4.repeate
+    mpirun -np 4 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.4.repeate
     let COUNTER=COUNTER+1
 done
 echo "Done"
@@ -156,7 +220,7 @@ COUNTER=0
 
 echo "Start MPI programm with 5 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    mpirun -np 5 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.5.repeate
+    mpirun -np 5 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.5.repeate
     let COUNTER=COUNTER+1
 done
 echo "Done"
@@ -166,7 +230,7 @@ COUNTER=0
 
 echo "Start MPI programm with 9 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    mpirun -np 9 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.9.repeate
+    mpirun -np 9 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.9.repeate
     let COUNTER=COUNTER+1
 done
 echo "Done"
@@ -176,7 +240,7 @@ COUNTER=0
 
 echo "Start MPI programm with 15 process repeating..."
 while [ $COUNTER -lt $COUNTER_VAR ] ; do
-    mpirun -np 16 $RDIR/workMPI $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpi.16.repeate
+    mpirun -np 16 $RDIR/workMPINew $TEST_DIR/$TEST_FILE | head -n 1 >> $REPORT_DIR/result.mpiNew.16.repeate
     let COUNTER=COUNTER+1
 done
 echo "Done"
